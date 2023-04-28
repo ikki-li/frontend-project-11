@@ -1,10 +1,15 @@
 {
-  "name": "frontend-project-11",
+  "name": "@hexlet/code",
   "version": "1.0.0",
-  "description": "the third training project",
+  "description": "My webpack project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode=production --node-env=production",
+    "build:dev": "webpack --mode=development",
+    "build:prod": "webpack --mode=production --node-env=production",
+    "watch": "webpack --watch",
+    "serve": "webpack serve"
   },
   "type": "module",
   "repository": {
@@ -18,12 +23,22 @@
   },
   "homepage": "https://github.com/ikki-li/frontend-project-11#readme",
   "dependencies": {
-    "lodash": "^4.17.21"
+    "bootstrap": "^5.2.3",
+    "jquery": "^3.6.4",
+    "lodash": "^4.17.21",
+    "popper.js": "^1.16.1"
   },
   "devDependencies": {
+    "@webpack-cli/generators": "^3.0.2",
+    "css-loader": "^6.7.3",
     "eslint": "^8.39.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.27.5",
-    "prettier": "^2.8.8"
+    "html-webpack-plugin": "^5.5.1",
+    "prettier": "^2.8.8",
+    "style-loader": "^3.3.2",
+    "webpack": "^5.81.0",
+    "webpack-cli": "^5.0.2",
+    "webpack-dev-server": "^4.13.3"
   }
 }
