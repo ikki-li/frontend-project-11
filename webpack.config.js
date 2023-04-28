@@ -24,10 +24,6 @@ const config = {
     	title: 'Main template',
     	template: 'template.html'
     }),
-  ]
-
-    // Add your plugins here
-    // Learn more about plugins from https://webpack.js.org/configuration/plugins/
   ],
   module: {
     rules: [
@@ -37,10 +33,8 @@ const config = {
       },
       {
 	test: /\.css$/i,
-	use: ["style-loader", "css-lodaer"],
+	use: ["style-loader", "css-loader"],
       },
-      // Add your rules for custom modules here
-      // Learn more about loaders from https://webpack.js.org/loaders/
     ],
   },
 };
