@@ -1,4 +1,4 @@
 import 'bootstrap';
-import css from './style.css';
+import css from './styles.css';
 
-console.log("Hello World!");
+console.log('Hello World!');
