@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -5,6 +7,30 @@
         <title><%= htmlWebpackPlugin.options.title %></title>
     </head>
     <body>
-	 <p>I will move to London</p>
+        <main>
+            <section class="container-fluid">
+                <div class="row justify-content-center">
+                    <div class="col-8">
+                        <h1>RSS agregator</h1>
+                        <p class="lead">Follow your favorite websites</p>
+                        <form class="rss-form">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form">
+                                        <input id="url-input" aria-label="url" class="form-control" placeholder="ссылка RSS" autocomplete="off">
+                                        <label for="url-input" class="sr-only">Ссылка RSS</label>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" aria-label="add" class="h-100 btn btn-lg btn-success px-sm-5">Add</button> 
+                                </div>
+                            </div>
+                        </form>
+                        <p class="mt-2 small mb-0 text-muted">Example: https://ru.hexlet.io/lessons.rss</p>
+                    </div>
+                </div>
+        </section>
+        <section class="feedback"></section>
+        </main>
     </body>
 </html>
