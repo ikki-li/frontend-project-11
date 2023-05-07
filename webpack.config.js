@@ -1,39 +1,38 @@
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
 //
-import path from "path";
-import HtmlWebpackPlugin from "html-webpack-plugin";
+import path, { dirname } from 'path';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const isProduction = process.env.NODE_ENV == "production";
+const isProduction = process.env.NODE_ENV === 'production';
 
 const config = {
-  entry: "./src/index.js",
+  entry: './src/index.js',
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, 'dist'),
   },
   devServer: {
     open: true,
-    host: "localhost",
+    host: 'localhost',
   },
   plugins: [
     new HtmlWebpackPlugin({
-    	title: 'RSS-agregator',
-    	template: 'template.html'
+      title: 'RSS-agregator',
+      template: 'template.html',
     }),
   ],
   module: {
     rules: [
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
-        type: "asset",
+        type: 'asset',
       },
       {
-	test: /\.css$/i,
-	use: ["style-loader", "css-loader"],
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
       },
     ],
   },
@@ -41,9 +40,9 @@ const config = {
 
 export default () => {
   if (isProduction) {
-    config.mode = "production";
+    config.mode = 'production';
   } else {
-    config.mode = "development";
+    config.mode = 'development';
   }
   return config;
 };
