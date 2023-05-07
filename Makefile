@@ -7,9 +7,6 @@ publish:
 install:
 	npm install
 
-ci:
-	npm ci
-
 build:
 	npm run build
 
