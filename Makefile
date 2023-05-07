@@ -4,6 +4,14 @@ lint:
 publish:
 	npm publish --dry-run
 
-install-deps:
+install:
+	npm install
+
+ci:
 	npm ci
 
+build:
+	npm run build
+
+serve:
+	npm run serve
