@@ -11,8 +11,8 @@ ignorePatterns: ["main.js"]
 rules: 
   import/extensions: ["error", "ignorePackages", { "js": "always" }]
   no-underscore-dangle: [2, { "allow": ["__filename", "__dirname"] }]
-  no-console: 0,
-  no-unused-vars: 0,
-  no-param-reassign: 0,
+  no-console: 0
+  no-unused-vars: 0
+  no-param-reassign: 0
   indent: ["error", 2]
 root: true
