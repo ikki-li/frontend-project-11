@@ -96,13 +96,12 @@ export default () => {
         updateErrors(messages, watchedState);
       })
       .then(() => axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(`${data}`)}`))
-      .then((response) => {
-        if (response.status >= 200 && response.status < 300) {
-          return parse(response);
-        }
-        watchedState.loadingProcess.errors = 'Network problem';
-      })
-      .catch((_) => {
+      .then((response) => parse(response))
+    // if (response.status >= 200 && response.status < 300) {
+    //   return parse(response);
+    // }
+      .catch((e) => {
+        console.log(e);
         watchedState.loadingProcess.errors = (`${i18nInstance.t('feedback.loading_failed')}`);
         watchedState.loadingProcess.state = 'failed';
         _.noop();
