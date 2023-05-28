@@ -6,4 +6,4 @@
 
 ## Demonstration
 
-[!https://frontend-project-11-fjw9vj3z1-ikki-li.vercel.app/](https://frontend-project-11-fjw9vj3z1-ikki-li.vercel.app/)
+[!https://frontend-project-11-ikki-li.vercel.app/](https://frontend-project-11-ikki-li.vercel.app/)
