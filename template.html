@@ -22,40 +22,42 @@
             </div>
         </div>
         <main class="flex-grow-1">
-            <section class="container-fluid bg-dark p-5">
-                <div class="row">
-                    <div class="col-md-10 col-lg-8 mx-auto text-white">
-                        <h1 class="display-3 mb-0">RSS агрегатор</h1>
-                        <p class="lead">Начните читать RSS сегодня! Это легко, это красиво.</p>
-                        <form action="" class="rss-form text-body">
+            <section class="container-fluid">
+                <div class="row justify-content-center">
+                    <div class="col-8">
+                        <h1>RSS agregator</h1>
+                        <p class="lead">Follow your favorite websites</p>
+                        <form class="rss-form">
                             <div class="row">
                                 <div class="col">
-                                    <div class="form-floating">
-                                        <input id="url-input" autofocus required name="url" aria-label="url" class="form-control w-100" placeholder="ссылка RSS" autocomplete="off">
-                                        <label for="url-input">Ссылка RSS</label>
+                                    <div class="form needs-validation" novalidate>
+                                        <input id="url-input" name="url" aria-label="url" class="form-control" placeholder="RSS feeds url" autocomplete="off">
+                                        <label for="url-input" class="sr-only">RSS feeds url</label>
                                     </div>
                                 </div>
-                                <div class="col-auto">
-                                    <button type="submit" aria-label="add" class="h-100 btn btn-lg btn-primary px-sm-5">Добавить</button>
+                                <div class="col-auto"> 
+                                    <button type="submit" aria-label="add" class="h-100 btn btn-lg btn-success px-sm-5">Add</button> 
                                 </div>
                             </div>
                         </form>
-                        <p class="mt-2 mb-0 text-muted">Пример: https://ru.hexlet.io/lessons.rss</p>
-                        <p class="feedback m-0 position-absolute small text-danger"></p>
+                        <p id="example" class="mt-2 small mb-0 text-muted">Example: https://ru.hexlet.io/lessons.rss</p>
+                        <p class="feedback m-0 position-absolute small text-success"></p>
                     </div>
                 </div>
-            </section>
-            <section class="container-fluid container-xxl p-5">
-                <div class="row">
-                    <div class="col-md-10 col-lg-8 order-1 mx-auto posts"></div>
-                    <div class="col-md-10 col-lg-4 mx-auto order-0 order-lg-1 feeds"></div>
+        </section>
+        <section id="content" class="container-fluid container-xxl pt-1 px-5 pb-5">
+            <div class="row">
+                <div class="col-md-9 col-lg-7 order-1 mx-auto posts">
                 </div>
-            </section>
+                <div class="col-md-9 col-lg-3 order-lg-1 order-0 mx-auto feeds">
+                </div>
+            </div>
+        </section>
         </main>
-        <footer class="footer border-top py-3 mt-5 bg-light">
+        <footer class="footer border-top py-3 mt-5 bg-light ">
             <div class="container-xl">
                 <div class="text-center">
-                    created by <a href="https://ru.hexlet.io/professions/frontend/projects/11" target="_blank">Hexlet</a>
+                    created by <a href="https://github.com/ikki-li" target="_blank">ikki_li</a>
                 </div>
             </div>
         </footer>
