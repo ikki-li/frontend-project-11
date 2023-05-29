@@ -90,24 +90,22 @@ export default () => {
     validate(data, urls)
       .then(() => {
         updateData(watchedState, data);
-      })
-      .catch((err) => {
+      }, (err) => {
         const messages = err.errors.map((e) => i18nInstance.t(e.key)).join('');
         updateErrors(messages, watchedState);
+        return Promise.reject(err);
       })
-      .then(() => axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(`${data}`)}`))
+      .then(() => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(`${data}`)}`))
       .then((response) => parse(response))
-    // if (response.status >= 200 && response.status < 300) {
-    //   return parse(response);
+    // (err) => networkError.push(err);
     // }
-      .catch((e) => {
-        console.log(e);
-        watchedState.loadingProcess.errors = (`${i18nInstance.t('feedback.loading_failed')}`);
-        watchedState.loadingProcess.state = 'failed';
-        _.noop();
-      })
       .then((parsedData) => {
         updateFeedback(watchedState, parsedData);
-      });
+      }, (e) => {
+        watchedState.loadingProcess.errors = (`${i18nInstance.t('feedback.loading_failed')}`);
+        watchedState.loadingProcess.state = 'failed';
+        return Promise.reject(e);
+      })
+      .catch(_.noop);
   });
 };
