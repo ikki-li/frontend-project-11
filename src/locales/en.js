@@ -6,6 +6,7 @@ export default {
       existing_rss: 'RSS already exists',
       success_loading: 'RSS was loaded successfully',
       loading_failed: 'Resource does not contain valid RSS',
+      network_error: 'Network Problems. Try again.',
     },
     content: {
       posts: {
