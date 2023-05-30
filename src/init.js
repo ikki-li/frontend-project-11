@@ -39,19 +39,18 @@ export default () => {
   };
 
   const initialState = {
-    addingFeedsProcess: {
-      state: 'filling',
+    processState: 'filling',
+    processErrors: null,
+    form: {
       valid: false,
+      errors: '',
       fields: {
         urls: [],
       },
-      errors: '',
     },
-    loadingProcess: {
-      state: '',
+    data: {
       posts: [],
       feeds: [],
-      errors: '',
     },
   };
 
@@ -63,47 +62,40 @@ export default () => {
     return schema.validate(data, { abortEarly: false });
   };
 
-  const updateErrors = (errors, { addingFeedsProcess }) => {
-    addingFeedsProcess.valid = false;
-    addingFeedsProcess.errors = errors;
-    addingFeedsProcess.state = 'filling';
-  };
-
-  const updateData = ({ addingFeedsProcess }, data) => {
-    addingFeedsProcess.state = 'sending';
-    addingFeedsProcess.valid = true;
-    addingFeedsProcess.errors = null;
-    addingFeedsProcess.fields.urls.push(data);
-  };
-
-  const updateFeedback = ({ loadingProcess }, data) => {
-    loadingProcess.posts.unshift(...data.posts);
-    loadingProcess.feeds.unshift(data.feed);
-    loadingProcess.state = 'success';
+  const updateData = (watchState, data) => {
+    watchState.processState = 'processing';
+    watchState.form.valid = true;
+    watchState.form.errors = null;
+    watchState.form.fields.urls.push(data);
   };
 
   elements.formEl.addEventListener('submit', (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
     const data = formData.get('url');
-    const { urls } = initialState.addingFeedsProcess.fields;
+    const { urls } = initialState.form.fields;
     validate(data, urls)
       .then(() => {
         updateData(watchedState, data);
       }, (err) => {
         const messages = err.errors.map((e) => i18nInstance.t(e.key)).join('');
-        updateErrors(messages, watchedState);
+        watchedState.form.valid = false;
+        watchedState.form.errors = messages;
+        watchedState.processState = 'filling';
         return Promise.reject(err);
       })
       .then(() => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(`${data}`)}`))
-      .then((response) => parse(response))
-    // (err) => networkError.push(err);
-    // }
+      .then((response) => parse(response), (networkError) => {
+        watchedState.processErrors = i18nInstance.t('feedback.network_error');
+        Promise.reject(networkError);
+      })
       .then((parsedData) => {
-        updateFeedback(watchedState, parsedData);
+        watchedState.data.posts.unshift(...parsedData.posts);
+        watchedState.data.feeds.unshift(parsedData.feed);
+        watchedState.processState = 'processed';
       }, (e) => {
-        watchedState.loadingProcess.errors = (`${i18nInstance.t('feedback.loading_failed')}`);
-        watchedState.loadingProcess.state = 'failed';
+        watchedState.processErrors = (`${i18nInstance.t('feedback.loading_failed')}`);
+        watchedState.processState = 'failed';
         return Promise.reject(e);
       })
       .catch(_.noop);
