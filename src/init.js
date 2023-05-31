@@ -121,10 +121,9 @@ export default () => {
             watchedState.data.posts.unshift(...newPosts);
           }
         }));
-      Promise.all(promises);
+      Promise.all(promises)
+        .then(() => setTimeout(() => makeRegularRequests(initialState.form.fields.urls), 5000));
     }
-    setTimeout(() => makeRegularRequests(initialState.form.fields.urls), 5000);
   };
-
   makeRegularRequests(initialState.form.fields.urls);
 };
