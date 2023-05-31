@@ -90,6 +90,7 @@ export default () => {
         Promise.reject(networkError);
       })
       .then((parsedData) => {
+        console.log(parsedData);
         watchedState.data.posts.unshift(...parsedData.posts);
         watchedState.data.feeds.unshift(parsedData.feed);
         watchedState.processState = 'processed';
@@ -100,4 +101,30 @@ export default () => {
       })
       .catch(_.noop);
   });
+
+  const getNewPosts = (data1, data2) => {
+    const links = data1.map(({ link }) => link);
+    const newPosts = data2.filter(({ link }) => !links.includes(link));
+    return newPosts;
+  };
+
+  const makeRegularRequests = (urls) => {
+    if (initialState.form.urls.length !== 0) {
+      const promises = urls.map((url) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(`${url}`)}`)
+        .then((response) => parse(response), (networkError) => {
+          watchedState.processErrors = i18nInstance.t('feedback.network_error');
+          Promise.reject(networkError);
+        })
+        .then((parsedData) => {
+          const newPosts = getNewPosts(initialState.data.posts, parsedData.posts);
+          if (newPosts.length !== 0) {
+            watchedState.data.posts.unshift(...newPosts);
+          }
+        }));
+      Promise.all(promises);
+    }
+    setTimeout(() => makeRegularRequests(initialState.form.fields.urls), 5000);
+  };
+
+  makeRegularRequests(initialState.form.fields.urls);
 };
