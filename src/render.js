@@ -2,10 +2,16 @@ const isVisited = (list, item) => list.includes(item);
 
 export default (elements, initialState, i18nInstance) => (path, value, previousValue) => {
   const {
-    formEl, inputEl, feedbackEl, postsContainerEl, feedsContainerEl,
+    formEl, inputEl, submitEl, feedbackEl, postsContainerEl, feedsContainerEl,
   } = elements;
 
-  console.log(path);
+  if (initialState.processState === 'processing') {
+    submitEl.disabled = true;
+  }
+
+  if (initialState.processState === 'filling') {
+    submitEl.disabled = false;
+  }
 
   if (path === 'uiState.modal.visitedPostsId') {
     initialState.uiState.modal.visitedPostsId.forEach((visitedPostId) => {
@@ -50,6 +56,7 @@ export default (elements, initialState, i18nInstance) => (path, value, previousV
     inputEl.focus();
   }
   if (initialState.processState === 'processed') {
+    submitEl.disabled = false;
     const { posts, feeds } = initialState.data;
     postsContainerEl.innerHTML = '';
     feedsContainerEl.innerHTML = '';
@@ -85,6 +92,7 @@ export default (elements, initialState, i18nInstance) => (path, value, previousV
   }
 
   if (initialState.processState === 'failed') {
+    submitEl.disabled = false;
     feedbackEl.classList.remove('text-success');
     feedbackEl.classList.add('text-danger');
     feedbackEl.textContent = initialState.processErrors;
