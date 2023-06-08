@@ -1,4 +1,6 @@
-export default (response) => {
+export default (response, data) => {
+  const existingFeedsCount = data.feeds.length;
+  const existingPostsCount = data.posts.length;
   const result = {
     feed: {},
     posts: [],
@@ -12,10 +14,10 @@ export default (response) => {
   result.feed.name = titleEl.textContent;
   const descriptionEl = doc.querySelector('channel > description');
   result.feed.description = descriptionEl.textContent;
-  const feedId = Math.floor(Math.random());
+  const feedId = existingFeedsCount + 1;
   result.feed.id = feedId;
   const itemsEl = doc.querySelectorAll('item');
-  itemsEl.forEach((itemEl) => {
+  itemsEl.forEach((itemEl, index) => {
     const post = {};
     const titleItemEl = itemEl.querySelector('title');
     post.name = titleItemEl.textContent;
@@ -24,6 +26,7 @@ export default (response) => {
     const linkItemEl = itemEl.querySelector('link');
     post.link = linkItemEl.textContent;
     post.feedtId = feedId;
+    post.id = existingPostsCount + index + 1;
     result.posts.push(post);
   });
   return result;
