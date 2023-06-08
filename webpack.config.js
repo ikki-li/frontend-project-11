@@ -21,7 +21,7 @@ const config = {
   plugins: [
     new HtmlWebpackPlugin({
       title: 'RSS-agregator',
-      template: 'template.html',
+      template: 'index.html',
     }),
   ],
   module: {
