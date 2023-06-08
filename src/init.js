@@ -12,7 +12,7 @@ import resources from './locales/index.js';
 // const languages = ['en', 'ru'];
 
 export default () => {
-  const defaultLanguage = 'en';
+  const defaultLanguage = 'ru';
   const i18nInstance = i18n.createInstance();
   i18nInstance.init({
     lng: defaultLanguage,
@@ -36,6 +36,7 @@ export default () => {
     feedbackEl: document.querySelector('.feedback'),
     postsContainerEl: document.querySelector('.posts'),
     feedsContainerEl: document.querySelector('.feeds'),
+    contentSectionEl: document.querySelector('#content'),
   };
 
   const initialState = {
@@ -52,9 +53,38 @@ export default () => {
       posts: [],
       feeds: [],
     },
+    uiState: {
+      modal: {
+        active: {
+          name: null,
+          description: null,
+          link: null,
+        },
+        visitedPostsId: [],
+      },
+    },
   };
 
   const watchedState = onChange(initialState, render(elements, initialState, i18nInstance));
+
+  const getNewPosts = (data1, data2) => {
+    const links = data1.map(({ link }) => link);
+    const newPosts = data2.filter(({ link }) => !links.includes(link));
+    return newPosts;
+  };
+
+  const makeRegularRequest = (url) => {
+    axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(`${url}`)}`)
+      .then((response) => parse(response, initialState.data))
+      .catch((networkError) => console.log(networkError))
+      .then((parsedData) => {
+        const newPosts = getNewPosts(initialState.data.posts, parsedData.posts);
+        if (newPosts.length !== 0) {
+          watchedState.data.posts.unshift(...newPosts);
+        }
+      })
+      .then(() => setTimeout(() => makeRegularRequest(url), 5000));
+  };
 
   const validate = (data, urls) => {
     const schema = yup.string().trim().required().url()
@@ -85,12 +115,11 @@ export default () => {
         return Promise.reject(err);
       })
       .then(() => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(`${data}`)}`))
-      .then((response) => parse(response), (networkError) => {
+      .then((response) => parse(response, initialState.data), (networkError) => {
         watchedState.processErrors = i18nInstance.t('feedback.network_error');
         Promise.reject(networkError);
       })
       .then((parsedData) => {
-        console.log(parsedData);
         watchedState.data.posts.unshift(...parsedData.posts);
         watchedState.data.feeds.unshift(parsedData.feed);
         watchedState.processState = 'processed';
@@ -99,31 +128,33 @@ export default () => {
         watchedState.processState = 'failed';
         return Promise.reject(e);
       })
+      .then(() => makeRegularRequest(data))
       .catch(_.noop);
   });
-
-  const getNewPosts = (data1, data2) => {
-    const links = data1.map(({ link }) => link);
-    const newPosts = data2.filter(({ link }) => !links.includes(link));
-    return newPosts;
-  };
-
-  const makeRegularRequests = (urls) => {
-    if (initialState.form.urls.length !== 0) {
-      const promises = urls.map((url) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(`${url}`)}`)
-        .then((response) => parse(response), (networkError) => {
-          watchedState.processErrors = i18nInstance.t('feedback.network_error');
-          Promise.reject(networkError);
-        })
-        .then((parsedData) => {
-          const newPosts = getNewPosts(initialState.data.posts, parsedData.posts);
-          if (newPosts.length !== 0) {
-            watchedState.data.posts.unshift(...newPosts);
-          }
-        }));
-      Promise.all(promises)
-        .then(() => setTimeout(() => makeRegularRequests(initialState.form.fields.urls), 5000));
+  elements.contentSectionEl.addEventListener('click', (e) => {
+    const { id } = e.target.dataset;
+    if (e.target.tagName === 'A') {
+      e.preventDefault();
+      window.open(e.target.href);
+      if (!initialState.uiState.modal.visitedPostsId.includes(id)) {
+        watchedState.uiState.modal.visitedPostsId.push(id);
+        console.log(initialState.uiState.modal.visitedPostsId);
+      }
+      // eslint-disable-next-line no-useless-return
+      return;
     }
-  };
-  makeRegularRequests(initialState.form.fields.urls);
+    if (e.target.tagName === 'BUTTON') {
+      if (!initialState.uiState.modal.visitedPostsId.includes(id)) {
+        watchedState.uiState.modal.visitedPostsId.push(id);
+        console.log(initialState.uiState.modal.visitedPostsId);
+      }
+      const visiblePost = initialState.data.posts
+        .find((post) => post.id === Number(id));
+      watchedState.uiState.modal.active = {
+        name: visiblePost.name,
+        description: visiblePost.description,
+        link: visiblePost.link,
+      };
+    }
+  });
 };
