@@ -33,6 +33,7 @@ export default () => {
   const elements = {
     formEl: document.querySelector('.rss-form'),
     inputEl: document.querySelector('#url-input'),
+    submitEl: document.querySelector('[type="submit"]'),
     feedbackEl: document.querySelector('.feedback'),
     postsContainerEl: document.querySelector('.posts'),
     feedsContainerEl: document.querySelector('.feeds'),
