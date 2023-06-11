@@ -1,33 +1,23 @@
-export default (response, data) => {
-  const existingFeedsCount = data.feeds.length;
-  const existingPostsCount = data.posts.length;
+export default (data) => {
   const result = {
     feed: {},
     posts: [],
   };
   const parser = new DOMParser();
-  const doc = parser.parseFromString(response.data.contents, 'application/xml');
+  const doc = parser.parseFromString(data, 'application/xml');
   if (doc.querySelector('parsererror')) {
     throw new Error('resource contains invalid rss');
   }
-  const titleEl = doc.querySelector('channel > title');
-  result.feed.name = titleEl.textContent;
-  const descriptionEl = doc.querySelector('channel > description');
-  result.feed.description = descriptionEl.textContent;
-  const feedId = existingFeedsCount + 1;
-  result.feed.id = feedId;
+  result.feed = {
+    name: doc.querySelector('channel > title').textContent,
+    description: doc.querySelector('channel > description').textContent,
+    link: doc.querySelector('channel > link').textContent,
+  };
   const itemsEl = doc.querySelectorAll('item');
-  itemsEl.forEach((itemEl, index) => {
-    const post = {};
-    const titleItemEl = itemEl.querySelector('title');
-    post.name = titleItemEl.textContent;
-    const descriptionItemEl = itemEl.querySelector('description');
-    post.description = descriptionItemEl.textContent;
-    const linkItemEl = itemEl.querySelector('link');
-    post.link = linkItemEl.textContent;
-    post.feedtId = feedId;
-    post.id = existingPostsCount + index + 1;
-    result.posts.push(post);
-  });
+  itemsEl.forEach((itemEl) => result.posts.push({
+    name: itemEl.querySelector('title').textContent,
+    description: itemEl.querySelector('description').textContent,
+    link: itemEl.querySelector('link').textContent,
+  }));
   return result;
 };
