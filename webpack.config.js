@@ -1,5 +1,4 @@
-// Generated using webpack-cli https://github.com/webpack/webpack-cli
-//
+/* eslint-disable no-underscore-dangle */
 import path, { dirname } from 'path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { fileURLToPath } from 'url';
