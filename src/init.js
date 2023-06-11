@@ -20,10 +20,6 @@ const fetch = (url, state, i18nInstance) => axios
   .then((response) => parse(response.data.contents))
   .then((parsedRss) => {
     const feedId = _.uniqueId();
-    console.log({ ...parsedRss.feed, id: feedId, url });
-    console.log(parsedRss.posts.map((post) => ({
-      ...post, id: _.uniqueId(), feedId,
-    })));
     state.data.feeds.unshift({ ...parsedRss.feed, id: feedId, url });
     state.data.posts.unshift(...parsedRss.posts.map((post) => ({
       ...post, id: _.uniqueId(), feedId,
@@ -151,14 +147,11 @@ export default () => {
       window.open(e.target.href);
       if (!initialState.uiState.modal.visitedPostsId.includes(id)) {
         watchedState.uiState.modal.visitedPostsId.push(id);
-        console.log(initialState.uiState.modal.visitedPostsId);
       }
-      return;
     }
     if (e.target.tagName === 'BUTTON') {
       if (!initialState.uiState.modal.visitedPostsId.includes(id)) {
         watchedState.uiState.modal.visitedPostsId.push(id);
-        console.log(initialState.uiState.modal.visitedPostsId);
       }
       const visiblePost = initialState.data.posts
         .find((post) => post.id === id);
