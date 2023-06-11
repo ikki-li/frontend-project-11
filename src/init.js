@@ -9,7 +9,43 @@ import parse from './parser.js';
 import render from './render.js';
 import resources from './locales/index.js';
 
-// const languages = ['en', 'ru'];
+const validate = (data, urls) => {
+  const schema = yup.string().trim().required().url()
+    .notOneOf(urls);
+  return schema.validate(data, { abortEarly: false });
+};
+
+const getPath = (url) => `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(`${url}`)}`;
+
+const fetch = (url, state, i18nInstance) => axios
+  .get(getPath(url))
+  .then((response) => parse(response.data.contents))
+  .then((parsedRss) => {
+    const feedId = _.uniqueId();
+    console.log({ ...parsedRss.feed, id: feedId, url });
+    console.log(parsedRss.posts.map((post) => ({
+      ...post, id: _.uniqueId(), feedId,
+    })));
+    state.data.feeds.unshift({ ...parsedRss.feed, id: feedId, url });
+    state.data.posts.unshift(...parsedRss.posts.map((post) => ({
+      ...post, id: _.uniqueId(), feedId,
+    })));
+    state.processState = 'processed';
+  })
+  .catch((error) => {
+    state.processState = 'failed';
+    if (error.message === 'Network Error') {
+      state.processErrors = (`${i18nInstance.t('feedback.network_error')}`);
+      return;
+    }
+    state.processErrors = (`${i18nInstance.t('feedback.loading_failed')}`);
+  });
+
+const getNewPosts = (data1, data2) => {
+  const links = data1.map(({ link }) => link);
+  const newPosts = data2.filter(({ link }) => !links.includes(link));
+  return newPosts;
+};
 
 export default () => {
   const defaultLanguage = 'ru';
@@ -68,70 +104,48 @@ export default () => {
 
   const watchedState = onChange(initialState, render(elements, initialState, i18nInstance));
 
-  const getNewPosts = (data1, data2) => {
-    const links = data1.map(({ link }) => link);
-    const newPosts = data2.filter(({ link }) => !links.includes(link));
-    return newPosts;
-  };
-
   const makeRegularRequest = (url) => {
-    axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(`${url}`)}`)
-      .then((response) => parse(response, initialState.data))
-      .catch((networkError) => console.log(networkError))
+    axios.get(getPath(url))
+      .then((response) => parse(response.data.contents))
       .then((parsedData) => {
         const newPosts = getNewPosts(initialState.data.posts, parsedData.posts);
         if (newPosts.length !== 0) {
-          watchedState.data.posts.unshift(...newPosts);
+          const feedId = _.filter(initialState.data.feeds, (feed) => feed.url === url)[0].id;
+          watchedState.data.posts.unshift(...newPosts.map((post) => ({
+            ...post,
+            id: _.uniqueId(),
+            feedId,
+          })));
         }
       })
+      .catch(console.log)
       .then(() => setTimeout(() => makeRegularRequest(url), 5000));
-  };
-
-  const validate = (data, urls) => {
-    const schema = yup.string().trim().required().url()
-      .notOneOf(urls);
-    return schema.validate(data, { abortEarly: false });
-  };
-
-  const updateData = (watchState, data) => {
-    watchState.processState = 'processing';
-    watchState.form.valid = true;
-    watchState.form.errors = null;
-    watchState.form.fields.urls.push(data);
   };
 
   elements.formEl.addEventListener('submit', (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
-    const data = formData.get('url');
+    const newUrl = formData.get('url');
     const { urls } = initialState.form.fields;
-    validate(data, urls)
+    validate(newUrl, urls)
       .then(() => {
-        updateData(watchedState, data);
-      }, (err) => {
+        watchedState.processState = 'processing';
+        watchedState.form.valid = true;
+        watchedState.form.errors = null;
+        watchedState.form.fields.urls.push(newUrl);
+      })
+      .catch((err) => {
         const messages = err.errors.map((e) => i18nInstance.t(e.key)).join('');
         watchedState.form.valid = false;
         watchedState.form.errors = messages;
         watchedState.processState = 'filling';
-        return Promise.reject(err);
+        throw err;
       })
-      .then(() => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(`${data}`)}`))
-      .then((response) => parse(response, initialState.data), (networkError) => {
-        watchedState.processErrors = i18nInstance.t('feedback.network_error');
-        Promise.reject(networkError);
-      })
-      .then((parsedData) => {
-        watchedState.data.posts.unshift(...parsedData.posts);
-        watchedState.data.feeds.unshift(parsedData.feed);
-        watchedState.processState = 'processed';
-      }, (e) => {
-        watchedState.processErrors = (`${i18nInstance.t('feedback.loading_failed')}`);
-        watchedState.processState = 'failed';
-        return Promise.reject(e);
-      })
-      .then(() => makeRegularRequest(data))
-      .catch(_.noop);
+      .then(() => fetch(newUrl, watchedState, i18nInstance))
+      .then(() => makeRegularRequest(newUrl))
+      .catch((_.noop));
   });
+
   elements.contentSectionEl.addEventListener('click', (e) => {
     const { id } = e.target.dataset;
     if (e.target.tagName === 'A') {
@@ -141,7 +155,6 @@ export default () => {
         watchedState.uiState.modal.visitedPostsId.push(id);
         console.log(initialState.uiState.modal.visitedPostsId);
       }
-      // eslint-disable-next-line no-useless-return
       return;
     }
     if (e.target.tagName === 'BUTTON') {
@@ -150,7 +163,7 @@ export default () => {
         console.log(initialState.uiState.modal.visitedPostsId);
       }
       const visiblePost = initialState.data.posts
-        .find((post) => post.id === Number(id));
+        .find((post) => post.id === id);
       watchedState.uiState.modal.active = {
         name: visiblePost.name,
         description: visiblePost.description,
