@@ -47,15 +47,14 @@ export default (elements, initialState, i18nInstance) => (path, value, previousV
     feedbackEl.textContent = initialState.form.errors;
     return;
   }
-  if (initialState.form.valid === true) {
+
+  if (initialState.processState === 'processed') {
     inputEl.classList.remove('is-invalid');
     feedbackEl.classList.remove('text-danger');
     feedbackEl.classList.add('text-success');
     feedbackEl.textContent = i18nInstance.t('feedback.success_loading');
     formEl.reset();
     inputEl.focus();
-  }
-  if (initialState.processState === 'processed') {
     submitEl.disabled = false;
     const { posts, feeds } = initialState.data;
     postsContainerEl.innerHTML = '';
