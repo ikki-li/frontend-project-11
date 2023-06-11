@@ -1,6 +1,6 @@
 const isVisited = (list, item) => list.includes(item);
 
-export default (elements, initialState, i18nInstance) => (path, value, previousValue) => {
+export default (elements, initialState, i18nInstance) => (path) => {
   const {
     formEl, inputEl, submitEl, feedbackEl, postsContainerEl, feedsContainerEl,
   } = elements;
