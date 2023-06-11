@@ -1,5 +1,3 @@
-import 'bootstrap';
-// eslint-disable-next-line no-unused-vars
 import * as yup from 'yup';
 import onChange from 'on-change';
 import _ from 'lodash';
