@@ -27,7 +27,8 @@ make install
 ```
 make serve
 ```
-3. Build bundle
+3. Building bundle
 ```
 make build
 ```
+You can see the result in the directory dist/
